@@ -1,0 +1,9 @@
+# Volumes
+data-storage
+
+# IDE and OS files
+.DS_Store
+
+# Environment and application
+.env
+
