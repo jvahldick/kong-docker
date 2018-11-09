@@ -1,7 +1,8 @@
-version: "3.1"
+version: "3.7"
 
 networks:
-  ${NETWORK_NAME}:
+  # Change the NETWORK_NAME parameter on .env file if you change the name of the network
+  my-network:
     driver: ${NETWORK_DRIVER}
 
 services:
