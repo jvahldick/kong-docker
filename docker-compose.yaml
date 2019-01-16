@@ -1,9 +1,9 @@
 version: "3.7"
 
 networks:
-  # Change the NETWORK_NAME parameter on .env file if you change the name of the network
-  my-network:
-    driver: ${NETWORK_DRIVER}
+    custom_network:
+        external:
+            name: ${NETWORK_NAME}
 
 services:
 
@@ -22,7 +22,7 @@ services:
     ports:
     - 5432:5432
     networks:
-    - ${NETWORK_NAME}
+    - custom_network
     volumes:
     - ./data-storage/postgres:/var/lib/postgresql/data
 
@@ -33,7 +33,9 @@ services:
     build:
       context: .
       dockerfile: docker/kong/Dockerfile
-    command: "kong start --run-migrations"
+    command: >
+      /bin/sh -c "kong migrations bootstrap
+      && kong start"
     restart: on-failure
     environment:
       KONG_PG_USER: kong
@@ -60,21 +62,7 @@ services:
     - "8443:8443"
     - "8444:8444"
     networks:
-    - ${NETWORK_NAME}
-
-  #######################################
-  # Konga database prepare
-  #######################################
-  konga-prepare:
-    image: pantsel/konga:next
-    command: "-c prepare -a postgres --uri  postgresql://kong:kong@kong-database:5432/konga"
-    restart: on-failure
-    links:
-    - kong-database
-    depends_on:
-    - kong-database
-    networks:
-    - ${NETWORK_NAME}
+    - custom_network
 
   #######################################
   # Konga: Kong GUI
@@ -95,4 +83,4 @@ services:
     ports:
     - "1337:1337"
     networks:
-    - ${NETWORK_NAME}
+    - custom_network
